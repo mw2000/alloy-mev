@@ -27,9 +27,8 @@ async fn main() -> Result<()> {
 
     // Build a provider with MEV
     let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
         .wallet(tx_signer.clone())
-        .on_http(eth_rpc.parse()?);
+        .connect_http(eth_rpc.parse()?);
 
     // Pay Vitalik using a MEV-Share bundle!
     let tx = TransactionRequest::default()

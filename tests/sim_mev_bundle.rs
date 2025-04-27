@@ -19,9 +19,8 @@ async fn test_sim_mev_bundle() {
     let wallet = EthereumWallet::new(signer.clone());
 
     let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
         .wallet(wallet.clone())
-        .on_http(eth_rpc.parse().unwrap());
+        .connect_http(eth_rpc.parse().unwrap());
 
     let block_number = 20247245;
     // tx 0x0722b12f3f46877a5251ecce105263ccf9f5390f9fab5ecc51e4858705fd8667

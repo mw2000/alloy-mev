@@ -19,9 +19,8 @@ async fn test_call_eth_bundle() {
     let wallet = EthereumWallet::new(signer.clone());
 
     let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
         .wallet(wallet.clone())
-        .on_http(eth_rpc.parse().unwrap());
+        .connect_http(eth_rpc.parse().unwrap());
 
     let endpoints = provider
         .endpoints_builder()
@@ -41,6 +40,9 @@ async fn test_call_eth_bundle() {
                 gas_limit: None,
                 difficulty: None,
                 base_fee: None,
+                transaction_index: None,
+                coinbase: None,
+                timeout: None, 
             },
             &endpoints,
         )

@@ -24,11 +24,10 @@ pub type EthereumReqwestMevShareBundle<'a, P, S> =
     MevShareBundle<'a, P, Http<reqwest::Client>, Ethereum, S>;
 
 #[async_trait]
-impl<F, P, N> MevShareProviderExt<reqwest::Client, N>
-    for FillProvider<F, P, Http<reqwest::Client>, N>
+impl<F, P, N> MevShareProviderExt<reqwest::Client, N> for FillProvider<F, P, N>
 where
     F: TxFiller<N>,
-    P: Provider<Http<reqwest::Client>, N>,
+    P: Provider<N>,
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
@@ -67,10 +66,14 @@ where
         S: Signer + Clone + Send + Sync + 'static,
     {
         let request = self.client().make_request("mev_sendBundle", (bundle,));
+        
+        let transport = self.client().transport();
+        let http = transport.as_any().downcast_ref::<Http<reqwest::Client>>().cloned()
+            .expect("Expected Http<reqwest::Client> transport");
 
         RpcCall::new(
             request,
-            MevHttp::flashbots(self.client().transport().clone(), signer),
+            MevHttp::flashbots(http, signer),
         )
         .await
     }
@@ -88,9 +91,13 @@ where
             .client()
             .make_request("mev_simBundle", (bundle, sim_overrides));
 
+        let transport = self.client().transport();
+        let http = transport.as_any().downcast_ref::<Http<reqwest::Client>>().cloned()
+            .expect("Expected Http<reqwest::Client> transport");
+
         RpcCall::new(
             request,
-            MevHttp::flashbots(self.client().transport().clone(), signer),
+            MevHttp::flashbots(http, signer),
         )
         .await
     }

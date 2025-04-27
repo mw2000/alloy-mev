@@ -21,7 +21,7 @@ use crate::MevHttp;
 #[derive(Debug)]
 pub struct MevShareBundle<'a, P, C, N, S>
 where
-    P: Provider<Http<C>, N>,
+    P: Provider<N>,
     C: Clone,
     N: Network,
     S: Signer + Send + Sync + 'static,
@@ -35,7 +35,7 @@ where
 
 impl<'a, P, C, N, S> MevShareBundle<'a, P, C, N, S>
 where
-    P: Provider<Http<C>, N>,
+    P: Provider<N>,
     C: Clone,
     N: Network,
     S: Signer + Send + Sync + 'static,
@@ -101,10 +101,14 @@ where
             .client()
             .make_request("mev_sendBundle", (self.bundle,));
 
+        let transport = self.provider.client().transport();
+        let http = transport.as_any().downcast_ref::<Http<C>>().cloned()
+            .expect("Expected Http transport");
+
         RpcCall::new(
             request,
             MevHttp::flashbots(
-                self.provider.client().transport().clone(),
+                http,
                 self.bundle_signer,
             ),
         )
@@ -123,10 +127,14 @@ where
             .client()
             .make_request("mev_simBundle", (self.bundle, sim_overrides));
 
+        let transport = self.provider.client().transport();
+        let http = transport.as_any().downcast_ref::<Http<C>>().cloned()
+            .expect("Expected Http transport");
+
         RpcCall::new(
             request,
             MevHttp::flashbots(
-                self.provider.client().transport().clone(),
+                http,
                 self.bundle_signer,
             ),
         )

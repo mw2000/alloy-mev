@@ -14,7 +14,7 @@ use crate::{BroadcastableCall, Endpoints};
 #[derive(Debug)]
 pub struct EthBundle<'a, P, T, N>
 where
-    P: Provider<T, N>,
+    P: Provider<N>,
     T: Transport + Clone,
     N: Network,
 {
@@ -25,7 +25,7 @@ where
 
 impl<'a, P, T, N> EthBundle<'a, P, T, N>
 where
-    P: Provider<T, N>,
+    P: Provider<N>,
     T: Transport + Clone,
     N: Network,
 {

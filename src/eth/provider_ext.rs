@@ -16,7 +16,7 @@ use super::{Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
-pub trait EthMevProviderExt<C, N>: Provider<Http<C>, N> + Sized
+pub trait EthMevProviderExt<C, N>: Provider<N> + Sized
 where
     C: Clone,
     N: Network,

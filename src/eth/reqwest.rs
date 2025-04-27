@@ -20,15 +20,19 @@ use crate::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevPro
 pub type EthereumReqwestEthBundle<'a, P> = EthBundle<'a, P, Http<reqwest::Client>, Ethereum>;
 
 #[async_trait]
-impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, Http<reqwest::Client>, N>
+impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, N>
 where
     F: TxFiller<N>,
-    P: Provider<Http<reqwest::Client>, N>,
+    P: Provider<N>,
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
     fn endpoints_builder(&self) -> EndpointsBuilder<reqwest::Client> {
-        EndpointsBuilder::new(self.client().transport().clone())
+        let transport = self.client().transport();
+        match transport.as_any().downcast_ref::<Http<reqwest::Client>>() {
+            Some(http) => EndpointsBuilder::new(http.clone()),
+            None => panic!("Expected Http<reqwest::Client> transport"),
+        }
     }
 
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes> {
